@@ -7,16 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- 🔥 Firebase SDK für Echtzeit-Synchronisation -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
     <!-- App Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
-    <!-- 🌐 Universal Sync System -->
-    <script src="universal-sync.js"></script>
+    <!-- � Professionelle Cloud-Datenbank System -->
+    <script src="database-config.js"></script>
+    <script src="supabase-cloud-db.js"></script>
     <script src="enhanced-functions.js"></script>
     <style>
         :root {
@@ -426,75 +423,6 @@
             gap: 8px;
             color: var(--gray-600);
             font-size: 14px;
-        }
-
-        .sync-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            margin-right: 12px;
-        }
-
-        .sync-status {
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            min-width: 120px;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-
-        .sync-status.success {
-            background: #10b981;
-            color: white;
-            border-color: #059669;
-        }
-
-        .sync-status.error {
-            background: #ef4444;
-            color: white;
-            border-color: #dc2626;
-        }
-
-        .sync-status.warning {
-            background: #f59e0b;
-            color: white;
-            border-color: #d97706;
-        }
-
-        .sync-status.syncing {
-            background: #667eea;
-            color: white;
-            border-color: #5a6fd8;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .sync-status.info {
-            background: var(--gray-200);
-            color: var(--gray-700);
-            border-color: var(--gray-300);
-        }
-
-        .last-sync {
-            font-size: 10px;
-            color: var(--gray-400);
-            font-weight: 500;
-        }
-
-        @keyframes pulse {
-            0%, 100% { 
-                opacity: 1; 
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.7; 
-                transform: scale(1.02);
-            }
         }
 
         .main-content {
@@ -1049,18 +977,10 @@
                     <button class="btn btn-secondary" onclick="toggleDarkMode()" title="Dark Mode umschalten">
                         <i class="fas fa-moon" id="darkModeIcon"></i>
                     </button>
-                    <button class="btn btn-primary" onclick="window.universalSync?.manualSync()" title="🔄 Jetzt synchronisieren">
-                        <i class="fas fa-sync-alt"></i>
-                        Sync
-                    </button>
                     <button class="btn btn-secondary" onclick="openAdminPanel()" id="adminButton" style="display: none;">
                         <i class="fas fa-cog"></i>
                         Verwaltung
                     </button>
-                    <div class="sync-info">
-                        <div id="syncStatus" class="sync-status">🔄 Initialisiere...</div>
-                        <div id="lastSyncTime" class="last-sync"></div>
-                    </div>
                     <div class="user-info">
                         <i class="fas fa-user"></i>
                         <span id="currentUser">Benutzer</span>

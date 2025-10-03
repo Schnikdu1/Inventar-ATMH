@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Asset Management System - Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- App Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- 🌍 Globale Cloud-Synchronisation für Internet-Hosting -->
+    <script src="global-cloud-sync.js"></script>
+    <script src="enhanced-functions.js"></script>
+    
+    <style>
+        /* Status-Indikator für globale Sync */
+        .global-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 9999;
+            opacity: 0.7;
+        }
+        
+        .header-info {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .header-info h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header-info p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Globaler Status-Indikator -->
+    <div id="globalStatus" class="global-status">🌍 Initialisiere...</div>
+    
+    <!-- Header für Internet-Version -->
+    <div class="header-info">
+        <h1><i class="fas fa-laptop"></i> IT Asset Management System</h1>
+        <p>🌍 Weltweit synchronisiert • 🔄 Automatische Cloud-Sync • 📱 Multi-Device</p>
+    </div>
+
+    <!-- Hier wird der Rest der App eingefügt -->
+    <div id="app-container">
+        <!-- Der komplette App-Inhalt wird hier automatisch geladen -->
+    </div>
+
+    <script>
+        // App-Inhalt aus der originalen index.html laden
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lade den kompletten App-Inhalt
+            fetch('index.html')
+                .then(response => response.text())
+                .then(html => {
+                    // Extrahiere nur den Body-Inhalt
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const bodyContent = doc.body.innerHTML;
+                    
+                    // Füge den Inhalt ein (ohne Header-Info zu überschreiben)
+                    const appContainer = document.getElementById('app-container');
+                    if (appContainer) {
+                        appContainer.innerHTML = bodyContent;
+                    }
+                })
+                .catch(error => {
+                    console.log('Lade App-Inhalt direkt...');
+                    // Fallback: Zeige eine Basis-Version
+                    loadBasicApp();
+                });
+        });
+
+        function loadBasicApp() {
+            // Basis-App falls die Hauptversion nicht lädt
+            document.getElementById('app-container').innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h2>🚀 App wird geladen...</h2>
+                    <p>Falls dies nicht automatisch funktioniert, öffnen Sie bitte die <code>index.html</code> direkt.</p>
+                    <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-external-link-alt"></i> App direkt öffnen
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
