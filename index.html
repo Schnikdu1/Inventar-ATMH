@@ -1,0 +1,3257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Asset Management System - Erweitert</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- App Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- � Professionelle Cloud-Datenbank System -->
+    <script src="database-config.js"></script>
+    <script src="ultra-live-sync.js"></script>
+    <script src="enhanced-functions.js"></script>
+    <style>
+        :root {
+            --primary-500: #667eea;
+            --primary-600: #5a6fd8;
+            --success-500: #10b981;
+            --danger-500: #ef4444;
+            --warning-500: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-500) 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Loan System Styles */
+        .device-status.active {
+            background: var(--success-100);
+            color: var(--success-700);
+        }
+
+        .device-status.overdue {
+            background: var(--danger-100);
+            color: var(--danger-700);
+            animation: pulse 2s infinite;
+        }
+
+        .device-status.returned {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .app-container { 
+            background: var(--gray-900); 
+            color: var(--gray-100);
+        }
+        
+        body.dark-mode .login-box,
+        body.dark-mode .app-header,
+        body.dark-mode .tabs-container,
+        body.dark-mode .device-card,
+        body.dark-mode .modal-content,
+        body.dark-mode .barcode-container,
+        body.dark-mode .scanner-input,
+        body.dark-mode .device-preview {
+            background: var(--gray-800);
+            border-color: var(--gray-700);
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .form-input,
+        body.dark-mode .urgency-option { 
+            background: var(--gray-700); 
+            border-color: var(--gray-600); 
+            color: var(--gray-100); 
+        }
+
+        body.dark-mode .form-input::placeholder {
+            color: var(--gray-400);
+        }
+
+        body.dark-mode .form-input:focus {
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .tab-button { 
+            color: var(--gray-300); 
+        }
+        
+        body.dark-mode .tab-button.active,
+        body.dark-mode .tab-button:hover { 
+            color: var(--gray-100);
+            background: var(--gray-700);
+        }
+
+        body.dark-mode .btn-secondary {
+            background: var(--gray-700);
+            color: var(--gray-100);
+            border-color: var(--gray-600);
+        }
+
+        body.dark-mode .btn-secondary:hover {
+            background: var(--gray-600);
+            color: var(--gray-50);
+        }
+
+        body.dark-mode .device-info-label {
+            color: var(--gray-300);
+        }
+
+        body.dark-mode .device-info-value {
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .device-name,
+        body.dark-mode .content-title,
+        body.dark-mode .login-title,
+        body.dark-mode .modal-title,
+        body.dark-mode h1, 
+        body.dark-mode h2, 
+        body.dark-mode h3, 
+        body.dark-mode h4 {
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .login-subtitle,
+        body.dark-mode .form-label,
+        body.dark-mode label {
+            color: var(--gray-300);
+        }
+
+        body.dark-mode .status-badge {
+            border: 1px solid var(--gray-600);
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .defect-info {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--warning-500);
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .defect-title {
+            color: var(--warning-300);
+        }
+
+        body.dark-mode .defect-description {
+            color: var(--gray-200);
+        }
+
+        body.dark-mode .barcode-svg {
+            filter: invert(1);
+        }
+
+        body.dark-mode .scanner-status {
+            color: var(--gray-200);
+        }
+
+        body.dark-mode .scanner-result h4,
+        body.dark-mode .scanner-error h4 {
+            color: var(--gray-100);
+        }
+
+        body.dark-mode .error-message {
+            color: var(--gray-200);
+        }
+
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: var(--gray-700);
+            color: var(--gray-100);
+            border-color: var(--gray-600);
+        }
+
+        body.dark-mode option {
+            background: var(--gray-700);
+            color: var(--gray-100);
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-500), #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-500), #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-success {
+            background: var(--success-500);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-500);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fef2f2;
+            color: var(--danger-500);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #fecaca;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* App Screen */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            background: var(--gray-50);
+        }
+
+        .app-header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-500), #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 16px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button.active {
+            color: var(--primary-500);
+            border-bottom: 2px solid var(--primary-500);
+        }
+
+        .tab-button:hover {
+            color: var(--primary-500);
+            background: #f8fafc;
+        }
+
+        .tab-content {
+            padding: 24px;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Device Grid */
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .device-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+
+        .device-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .device-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 16px;
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .device-actions .btn {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .device-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .device-info-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .device-info-value {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-assigned {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-maintenance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-defective {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Defect Info */
+        .defect-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fef3c7;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning-500);
+        }
+
+        .defect-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .defect-description {
+            font-size: 13px;
+            color: #92400e;
+            margin-bottom: 4px;
+        }
+
+        .defect-meta {
+            font-size: 12px;
+            color: #78716c;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content.large {
+            max-width: 800px;
+        }
+
+        .modal-header {
+            padding: 24px 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Defect Modal Specific */
+        .defect-urgency {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .urgency-option {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .urgency-option:hover {
+            border-color: var(--primary-500);
+        }
+
+        .urgency-option.selected {
+            border-color: var(--primary-500);
+            background: #f0f4ff;
+        }
+
+        .urgency-low { border-color: var(--success-500); }
+        .urgency-low.selected { background: #d1fae5; border-color: var(--success-500); }
+
+        .urgency-medium { border-color: var(--warning-500); }
+        .urgency-medium.selected { background: #fef3c7; border-color: var(--warning-500); }
+
+        .urgency-high { border-color: var(--danger-500); }
+        .urgency-high.selected { background: #fee2e2; border-color: var(--danger-500); }
+
+        /* Admin Panel */
+        .admin-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 24px;
+        }
+
+        .admin-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-600);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .admin-tab.active {
+            color: var(--primary-500);
+            border-bottom: 2px solid var(--primary-500);
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .user-info-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .user-role {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-user {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Barcode Styles */
+        .barcode-container {
+            margin: 12px 0;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .barcode-display {
+            margin: 8px 0;
+        }
+
+        .barcode-svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .barcode-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .barcode-actions .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .barcode-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .barcode-input-group input {
+            flex: 1;
+        }
+
+        .barcode-input-group .btn {
+            padding: 12px 16px;
+            white-space: nowrap;
+        }
+
+        /* Scanner Modal Styles */
+        .scanner-container {
+            text-align: center;
+        }
+
+        #barcode-reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border: 2px solid var(--gray-300);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .scanner-input {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .scanner-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--success-500);
+            color: white;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .scanner-error {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--danger-500);
+            color: white;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .scanner-status {
+            margin: 10px 0;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .device-preview {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-right {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .tabs-header {
+                flex-direction: column;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .device-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .defect-urgency {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <h1 class="login-title">IT Asset Management</h1>
+                <p class="login-subtitle">Melden Sie sich an, um fortzufahren</p>
+            </div>
+
+            <div id="errorContainer" class="error-message hidden">
+                <span id="errorMessage"></span>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">Benutzername</label>
+                    <input type="text" id="username" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Passwort</label>
+                    <input type="password" id="password" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Anmelden
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="appScreen" class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="app-logo">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h1 class="app-title">IT Asset Management</h1>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-success" onclick="openBarcodeScanner()" title="Barcode scannen">
+                        <i class="fas fa-qrcode"></i>
+                        Scanner
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleDarkMode()" title="Dark Mode umschalten">
+                        <i class="fas fa-moon" id="darkModeIcon"></i>
+                    </button>
+                    <button class="btn btn-secondary" onclick="openAdminPanel()" id="adminButton" style="display: none;">
+                        <i class="fas fa-cog"></i>
+                        Verwaltung
+                    </button>
+                    <div class="user-info">
+                        <i class="fas fa-user"></i>
+                        <span id="currentUser">Benutzer</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Abmelden
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-button active" onclick="switchTab(0)">
+                        <i class="fas fa-laptop"></i>
+                        Laptops
+                    </button>
+                    <button class="tab-button" onclick="switchTab(1)">
+                        <i class="fas fa-tablet-alt"></i>
+                        iPads
+                    </button>
+                    <button class="tab-button" onclick="switchTab(2)">
+                        <i class="fas fa-desktop"></i>
+                        PCs
+                    </button>
+                    <button class="tab-button" onclick="switchTab(3)">
+                        <i class="fas fa-handshake"></i>
+                        Verleihung
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="content-header">
+                        <h2 class="content-title" id="contentTitle">Laptops</h2>
+                        <div class="actions">
+                            <button class="btn btn-success" onclick="openAddModal()">
+                                <i class="fas fa-plus"></i>
+                                Gerät hinzufügen
+                            </button>
+                            <label class="btn btn-secondary">
+                                <i class="fas fa-upload"></i>
+                                CSV Import
+                                <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                            </label>
+                            <button class="btn btn-secondary" onclick="exportCSV()">
+                                <i class="fas fa-download"></i>
+                                CSV Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="deviceList" class="device-grid">
+                        <!-- Devices will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Device Modal -->
+    <div id="deviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Gerät hinzufügen</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="deviceForm">
+                    <div class="form-group">
+                        <label class="form-label">Gerätename</label>
+                        <input type="text" id="deviceName" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Barcode</label>
+                        <div class="barcode-input-group">
+                            <input type="text" id="deviceBarcode" class="form-input" placeholder="Automatisch generiert oder manuell eingeben">
+                            <button type="button" class="btn btn-secondary" onclick="generateNewBarcode()">
+                                <i class="fas fa-barcode"></i>
+                                Generieren
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Inventarnummer</label>
+                            <input type="text" id="inventoryNumber" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Modell</label>
+                            <input type="text" id="deviceModel" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Betriebssystem</label>
+                            <select id="deviceOS" class="form-input">
+                                <option value="">Bitte wählen...</option>
+                                <option value="Windows 11">Windows 11</option>
+                                <option value="Windows 10">Windows 10</option>
+                                <option value="Windows 7">Windows 7</option>
+                                <option value="Ubuntu">Ubuntu</option>
+                                <option value="macOS">macOS</option>
+                                <option value="iPadOS">iPadOS</option>
+                                <option value="Sonstiges">Sonstiges</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Standort</label>
+                            <select id="deviceLocation" class="form-input">
+                                <option value="">Bitte wählen...</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Zugewiesen an</label>
+                            <input type="text" id="assignedTo" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="deviceStatus" class="form-input">
+                                <option value="Verfügbar">Verfügbar</option>
+                                <option value="Zugewiesen">Zugewiesen</option>
+                                <option value="Wartung">Wartung</option>
+                                <option value="Defekt">Defekt</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bemerkungen</label>
+                        <textarea id="remarks" class="form-input" rows="3"></textarea>
+                    </div>
+
+                    <div class="actions" style="margin-top: 24px;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i>
+                            Speichern
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Defect Report Modal -->
+    <div id="defectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Defekt melden</h3>
+                <button class="modal-close" onclick="closeDefectModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="defectForm">
+                    <div class="form-group">
+                        <label class="form-label">Gerät</label>
+                        <input type="text" id="defectDeviceName" class="form-input" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dringlichkeit</label>
+                        <div class="defect-urgency">
+                            <div class="urgency-option urgency-low" onclick="selectUrgency('low')">
+                                <i class="fas fa-info-circle"></i>
+                                <div>Niedrig</div>
+                            </div>
+                            <div class="urgency-option urgency-medium selected" onclick="selectUrgency('medium')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>Mittel</div>
+                            </div>
+                            <div class="urgency-option urgency-high" onclick="selectUrgency('high')">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div>Hoch</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Problembeschreibung</label>
+                        <textarea id="defectDescription" class="form-input" rows="4" required placeholder="Beschreiben Sie das Problem detailliert..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Gemeldet von</label>
+                        <input type="text" id="defectReporter" class="form-input" required>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Defekt melden
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeDefectModal()">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Passwort ändern</h3>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: var(--gray-600);">
+                    Sie müssen Ihr Passwort bei der ersten Anmeldung ändern.
+                </p>
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label class="form-label">Neues Passwort</label>
+                        <input type="password" id="newUserPasswordChange" class="form-input" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Passwort bestätigen</label>
+                        <input type="password" id="confirmUserPassword" class="form-input" required>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Passwort ändern
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 class="modal-title">Verwaltungsbereich</h3>
+                <button class="modal-close" onclick="closeAdminModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('users')">
+                        <i class="fas fa-users"></i>
+                        Benutzerverwaltung
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('settings')">
+                        <i class="fas fa-cog"></i>
+                        Einstellungen
+                    </button>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="adminUsersTab" class="admin-content active">
+                    <div class="content-header">
+                        <h4>Benutzer verwalten</h4>
+                        <button class="btn btn-success" onclick="openAddUserModal()">
+                            <i class="fas fa-plus"></i>
+                            Benutzer hinzufügen
+                        </button>
+                    </div>
+                    <div id="usersList" class="user-list">
+                        <!-- Users will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="adminSettingsTab" class="admin-content">
+                    <div class="form-group">
+                        <label class="form-label">Admin-Passwort ändern</label>
+                        <div style="display: flex; gap: 12px;">
+                            <input type="password" id="newAdminPassword" class="form-input" placeholder="Neues Admin-Passwort">
+                            <button class="btn btn-primary" onclick="changeAdminPassword()">
+                                <i class="fas fa-key"></i>
+                                Ändern
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Neuen Benutzer hinzufügen</h3>
+                <button class="modal-close" onclick="closeAddUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-group">
+                        <label class="form-label">Benutzername</label>
+                        <input type="text" id="newUsername" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Vollständiger Name</label>
+                        <input type="text" id="newUserFullName" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rolle</label>
+                        <select id="newUserRole" class="form-input" required>
+                            <option value="user">Benutzer</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Temporäres Passwort</label>
+                        <input type="password" id="newUserPassword" class="form-input" required>
+                        <small style="color: var(--gray-600);">Der Benutzer muss das Passwort bei der ersten Anmeldung ändern.</small>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus"></i>
+                            Benutzer erstellen
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Confirmation Modal -->
+    <div id="adminPasswordConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Admin-Berechtigung erforderlich</h3>
+                <button class="modal-close" onclick="closeAdminPasswordConfirm()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: var(--gray-600);">
+                    Bitte geben Sie Ihr Admin-Passwort ein, um auf den Verwaltungsbereich zuzugreifen.
+                </p>
+                <form id="adminPasswordConfirmForm">
+                    <div class="form-group">
+                        <label class="form-label">Admin-Passwort</label>
+                        <input type="password" id="confirmAdminPasswordInput" class="form-input" required>
+                    </div>
+
+                    <div id="adminPasswordError" class="error-message hidden">
+                        Falsches Admin-Passwort!
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-unlock"></i>
+                            Zugriff gewähren
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAdminPasswordConfirm()">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Setup Modal -->
+    <div id="adminPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Admin-Passwort einrichten</h3>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: var(--gray-600);">
+                    Sie greifen zum ersten Mal auf den Verwaltungsbereich zu. 
+                    Bitte legen Sie ein sicheres Admin-Passwort fest.
+                </p>
+                <form id="setupAdminPasswordForm">
+                    <div class="form-group">
+                        <label class="form-label">Admin-Passwort</label>
+                        <input type="password" id="setupAdminPassword" class="form-input" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Passwort bestätigen</label>
+                        <input type="password" id="confirmAdminPassword" class="form-input" required>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key"></i>
+                            Admin-Passwort festlegen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barcode Scanner Modal -->
+    <div id="barcodeScannerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Barcode Scanner</h3>
+                <button class="modal-close" onclick="closeBarcodeScanner()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="scanner-container">
+                    <p style="margin-bottom: 20px; color: var(--gray-600);">
+                        Scannen Sie einen Barcode mit der Kamera oder geben Sie ihn manuell ein.
+                    </p>
+                    
+                    <!-- Camera Scanner -->
+                    <div id="barcode-reader"></div>
+                    
+                    <div class="scanner-status" id="scanner-status">
+                        <i class="fas fa-camera"></i> Kamera wird initialisiert...
+                    </div>
+                    
+                    <!-- Manual Input -->
+                    <div class="scanner-input">
+                        <h4 style="margin-bottom: 12px;">Manuelle Eingabe</h4>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <input type="text" id="manual-barcode-input" class="form-input" 
+                                   placeholder="Barcode hier eingeben..." style="flex: 1;">
+                            <button class="btn btn-primary" onclick="searchManualBarcode()">
+                                <i class="fas fa-search"></i>
+                                Suchen
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results -->
+                    <div id="scanner-result" class="scanner-result">
+                        <h4><i class="fas fa-check-circle"></i> Gerät gefunden!</h4>
+                        <div id="device-preview" class="device-preview"></div>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-warning" onclick="reportDefectForFoundDevice()" id="report-defect-found-device">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Defekt melden
+                            </button>
+                            <button class="btn btn-secondary" onclick="editFoundDevice()" id="edit-found-device">
+                                <i class="fas fa-edit"></i>
+                                Gerät bearbeiten
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="scanner-error" class="scanner-error">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Nicht gefunden</h4>
+                        <p id="error-message">Kein Gerät mit diesem Barcode gefunden.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Modal -->
+    <div id="loanModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="loanModalTitle">Gerät ausleihen</h3>
+                <button class="modal-close" onclick="closeLoanModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="loanForm">
+                    <div class="form-group">
+                        <label class="form-label">Gerätetyp *</label>
+                        <select id="loanDeviceType" class="form-input" required onchange="updateDeviceList()">
+                            <option value="">Gerätetyp wählen...</option>
+                            <option value="laptops">Laptops</option>
+                            <option value="ipads">iPads</option>
+                            <option value="pcs">PCs</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="deviceSelectionGroup" style="display: none;">
+                        <label class="form-label">Gerät auswählen *</label>
+                        <select id="loanDeviceSelect" class="form-input" required>
+                            <option value="">Verfügbares Gerät wählen...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Entleiher *</label>
+                        <input type="text" id="loanBorrower" class="form-input" required placeholder="Name des Entleihers">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ausleihdatum *</label>
+                        <input type="date" id="loanDate" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Rückgabedatum *</label>
+                        <input type="date" id="loanDueDate" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Notizen</label>
+                        <textarea id="loanNotes" class="form-input" placeholder="Zusätzliche Notizen zur Ausleihe" rows="3"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-handshake"></i>
+                            <span id="loanSubmitText">Ausleihen</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeLoanModal()">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let currentUser = null;
+        let currentTab = 0;
+        let editingIndex = -1;
+        let reportingDefectIndex = -1;
+        let selectedUrgency = 'medium';
+
+        // Enhanced Data Storage
+        const devices = {
+            laptops: [],
+            ipads: [],
+            pcs: [],
+            loans: []  // Verleihungen
+        };
+
+        const deviceTypes = ['laptops', 'ipads', 'pcs', 'loans'];
+        const deviceNames = ['Laptops', 'iPads', 'PCs', 'Verleihungen'];
+
+        // Location options for each device type
+        const locationOptions = {
+            laptops: ['NBW1', 'NBW2', 'MZ', 'NB-Taschen'],
+            ipads: ['IPAD-Wagen', 'MZ', 'LZ'],
+            pcs: ['IF1', 'IF2', 'MZ']
+        };
+
+        // Enhanced User Management
+        let users = {
+            'mads.duewel': { password: 'Start123', fullName: 'Mads Düwel', isAdmin: false, firstLogin: true },
+            'jona.snoek': { password: 'Start123', fullName: 'Jona Snoek', isAdmin: false, firstLogin: true },
+            'admin': { password: 'Start123', fullName: 'Administrator', isAdmin: true, firstLogin: true }
+        };
+
+        let adminPasswords = {}; // Stores individual admin passwords
+
+        // Initialize App
+        function init() {
+            console.log('🚀 IT Asset Management System - Erweiterte Version wird gestartet...');
+            
+            // Load saved data
+            loadUsers();
+            loadAdminPasswords();
+            
+            // Event Listeners
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('deviceForm').addEventListener('submit', saveDevice);
+            document.getElementById('defectForm').addEventListener('submit', saveDefectReport);
+            document.getElementById('addUserForm').addEventListener('submit', addNewUser);
+            document.getElementById('setupAdminPasswordForm').addEventListener('submit', setupAdminPassword);
+            document.getElementById('changePasswordForm').addEventListener('submit', changeUserPassword);
+            document.getElementById('adminPasswordConfirmForm').addEventListener('submit', confirmAdminPassword);
+            document.getElementById('loanForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addDeviceToLoan();
+            });
+            document.getElementById('csvFile').addEventListener('change', handleCSVImport);
+            
+            // Barcode scanner event listeners
+            document.getElementById('manual-barcode-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchManualBarcode();
+                }
+            });
+            
+            // Global escape key handler
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close any open modals
+                    const openModal = document.querySelector('.modal[style*="flex"]');
+                    if (openModal) {
+                        if (openModal.id === 'barcodeScannerModal') {
+                            closeBarcodeScanner();
+                        } else {
+                            openModal.style.display = 'none';
+                        }
+                    }
+                }
+            });
+            
+            // Modal click outside to close
+            setupModalCloseEvents();
+
+            // Load theme
+            loadTheme();
+
+            // Load sample data
+            loadSampleData();
+            
+            console.log('✅ System erfolgreich gestartet');
+        }
+
+        function setupModalCloseEvents() {
+            const modals = ['deviceModal', 'defectModal', 'adminModal', 'addUserModal', 'barcodeScannerModal', 'changePasswordModal', 'adminPasswordModal', 'adminPasswordConfirmModal', 'loanModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            if (modalId === 'barcodeScannerModal') {
+                                closeBarcodeScanner();
+                            } else if (modalId === 'adminPasswordConfirmModal') {
+                                closeAdminPasswordConfirm();
+                            } else if (modalId === 'loanModal') {
+                                closeLoanModal();
+                            } else {
+                                this.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // Enhanced Authentication
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            console.log('🔐 Login-Versuch für:', username);
+            console.log('📋 Verfügbare Benutzer:', Object.keys(users));
+            
+            if (!username || !password) {
+                showError('Bitte geben Sie Benutzername und Passwort ein.');
+                return;
+            }
+            
+            if (users[username]) {
+                console.log('👤 Benutzer gefunden:', users[username].fullName);
+                if (users[username].password === password) {
+                    currentUser = users[username];
+                    currentUser.username = username;
+                    
+                    // Check if first login
+                    if (currentUser.firstLogin) {
+                        console.log('🔑 Erstes Login - Passwort ändern erforderlich');
+                        showChangePasswordModal();
+                        return;
+                    }
+                    
+                    showApp();
+                    hideError();
+                    console.log('✅ Login erfolgreich für:', currentUser.fullName);
+                } else {
+                    console.log('❌ Falsches Passwort für:', username);
+                    showError('Falsches Passwort. Bitte versuchen Sie es erneut.');
+                }
+            } else {
+                console.log('❌ Benutzer nicht gefunden:', username);
+                showError('Benutzer nicht gefunden. Bitte versuchen Sie es erneut.');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser.fullName;
+            
+            // Show admin button if user is admin
+            if (currentUser.isAdmin) {
+                document.getElementById('adminButton').style.display = 'inline-flex';
+            }
+            
+            updateLocationOptions();
+            renderDevices();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginForm').reset();
+            document.getElementById('adminButton').style.display = 'none';
+            showLogin();
+            console.log('👋 Benutzer abgemeldet');
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appScreen').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorContainer').classList.remove('hidden');
+        }
+
+        function hideError() {
+            document.getElementById('errorContainer').classList.add('hidden');
+        }
+
+        // Password Change System
+        function showChangePasswordModal() {
+            document.getElementById('changePasswordModal').style.display = 'flex';
+        }
+
+        function changeUserPassword(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newUserPasswordChange').value;
+            const confirmPassword = document.getElementById('confirmUserPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwörter stimmen nicht überein!');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('Passwort muss mindestens 6 Zeichen lang sein!');
+                return;
+            }
+            
+            // Update password
+            users[currentUser.username].password = newPassword;
+            users[currentUser.username].firstLogin = false;
+            saveUsers();
+            
+            document.getElementById('changePasswordModal').style.display = 'none';
+            showApp();
+            console.log('✅ Passwort erfolgreich geändert');
+        }
+
+        // Tab Management with Loan System
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach((btn, index) => {
+                btn.classList.toggle('active', index === tabIndex);
+            });
+            
+            // Update content title
+            document.getElementById('contentTitle').textContent = deviceNames[tabIndex];
+            
+            // Update location options for current device type (not for loans)
+            if (tabIndex < 3) {
+                updateLocationOptions();
+            }
+            
+            // Render devices/loans for current tab
+            if (tabIndex === 3) {
+                renderLoans();
+            } else {
+                renderDevices();
+            }
+            
+            console.log('📑 Wechsel zu Tab:', deviceNames[tabIndex]);
+        }
+
+        // Loan System Functions
+        function renderLoans() {
+            if (currentTab !== 3) return; // Only render if on loans tab
+            
+            const deviceList = document.getElementById('deviceList');
+            const loanArray = devices.loans || [];
+            
+            if (loanArray.length === 0) {
+                deviceList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--gray-500);">
+                        <i class="fas fa-handshake" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 8px;">Keine Ausleihungen vorhanden</h3>
+                        <p>Fügen Sie Ihre erste Ausleihe hinzu, um zu beginnen.</p>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus"></i>
+                            Erste Ausleihe erstellen
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            deviceList.innerHTML = loanArray.map((loan, index) => {
+                const isOverdue = loan.status === 'Aktiv' && new Date(loan.dueDate) < new Date();
+                const statusClass = loan.status === 'Zurückgegeben' ? 'returned' : (isOverdue ? 'overdue' : 'active');
+                
+                return `
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-name">${loan.deviceName || 'Unbenannt'}</div>
+                            <span class="device-status ${statusClass}">
+                                ${loan.status || 'Aktiv'}${isOverdue ? ' (Überfällig)' : ''}
+                            </span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Geräte-ID:</span>
+                            <span class="device-info-value">${loan.deviceId || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Entleiher:</span>
+                            <span class="device-info-value">${loan.borrower || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Ausgeliehen am:</span>
+                            <span class="device-info-value">${loan.loanDate ? new Date(loan.loanDate).toLocaleDateString('de-DE') : 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Rückgabe bis:</span>
+                            <span class="device-info-value">${loan.dueDate ? new Date(loan.dueDate).toLocaleDateString('de-DE') : 'N/A'}</span>
+                        </div>
+                        
+                        ${loan.returnDate ? `
+                            <div class="device-info-row">
+                                <span class="device-info-label">Zurückgegeben am:</span>
+                                <span class="device-info-value">${new Date(loan.returnDate).toLocaleDateString('de-DE')}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${loan.notes ? `
+                            <div class="device-info-row">
+                                <span class="device-info-label">Notizen:</span>
+                                <span class="device-info-value">${loan.notes}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${isOverdue ? `
+                            <div class="defect-info">
+                                <div class="defect-title">⚠️ Ausleihe überfällig</div>
+                                <div class="defect-description">Rückgabe war geplant für: ${new Date(loan.dueDate).toLocaleDateString('de-DE')}</div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="device-actions">
+                            ${loan.status === 'Aktiv' || !loan.status ? `
+                                <button class="btn btn-success" onclick="returnLoan(${index})" title="Zurücknehmen">
+                                    <i class="fas fa-undo"></i>
+                                    Zurücknehmen
+                                </button>
+                                <button class="btn btn-primary" onclick="editLoan(${index})" title="Bearbeiten">
+                                    <i class="fas fa-edit"></i>
+                                    Bearbeiten
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-danger" onclick="deleteLoan(${index})" title="Löschen">
+                                <i class="fas fa-trash"></i>
+                                Löschen
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); font-size: 12px; color: var(--gray-500);">
+                            Erstellt: ${loan.createdDate || new Date().toLocaleDateString('de-DE')} von ${loan.createdBy || 'System'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Loan Management Functions
+        let currentLoanId = null;
+
+        function openLoanModal() {
+            currentLoanId = null;
+            document.getElementById('loanModalTitle').textContent = 'Gerät ausleihen';
+            document.getElementById('loanSubmitText').textContent = 'Ausleihen';
+            document.getElementById('loanForm').reset();
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('loanDate').value = today;
+            
+            // Set default due date to one week from today
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('loanDueDate').value = nextWeek.toISOString().split('T')[0];
+            
+            document.getElementById('loanModal').style.display = 'flex';
+        }
+
+        function closeLoanModal() {
+            document.getElementById('loanModal').style.display = 'none';
+            document.getElementById('loanForm').reset();
+            document.getElementById('deviceSelectionGroup').style.display = 'none';
+            currentLoanId = null;
+        }
+
+        function updateDeviceList() {
+            const deviceType = document.getElementById('loanDeviceType').value;
+            const deviceSelect = document.getElementById('loanDeviceSelect');
+            const selectionGroup = document.getElementById('deviceSelectionGroup');
+            
+            if (!deviceType) {
+                selectionGroup.style.display = 'none';
+                return;
+            }
+            
+            // Clear existing options
+            deviceSelect.innerHTML = '<option value="">Verfügbares Gerät wählen...</option>';
+            
+            // Get available devices of selected type
+            const availableDevices = devices[deviceType].filter(device => 
+                device.status !== 'Ausgeliehen' && device.status !== 'Defekt'
+            );
+            
+            if (availableDevices.length === 0) {
+                deviceSelect.innerHTML = '<option value="">Keine verfügbaren Geräte</option>';
+                selectionGroup.style.display = 'block';
+                return;
+            }
+            
+            // Add available devices to dropdown
+            availableDevices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.inventoryNumber || device.name;
+                option.textContent = `${device.name || device.model} - ${device.inventoryNumber || 'Keine Nr.'} (${device.location || 'Unbekannt'})`;
+                option.dataset.deviceData = JSON.stringify(device);
+                deviceSelect.appendChild(option);
+            });
+            
+            selectionGroup.style.display = 'block';
+        }
+
+        function addDeviceToLoan() {
+            console.log('🔄 addDeviceToLoan aufgerufen');
+            
+            const deviceType = document.getElementById('loanDeviceType').value;
+            const deviceSelect = document.getElementById('loanDeviceSelect');
+            const selectedDeviceId = deviceSelect.value;
+            const borrower = document.getElementById('loanBorrower').value;
+            const loanDate = document.getElementById('loanDate').value;
+            const dueDate = document.getElementById('loanDueDate').value;
+            const notes = document.getElementById('loanNotes').value;
+
+            console.log('📊 Form Data:', { deviceType, selectedDeviceId, borrower, loanDate, dueDate });
+
+            if (!deviceType || !selectedDeviceId || !borrower || !loanDate || !dueDate) {
+                alert('Bitte füllen Sie alle Pflichtfelder aus.');
+                console.log('❌ Validation failed: Pflichtfelder fehlen');
+                return;
+            }
+
+            // Check if due date is after loan date
+            if (new Date(dueDate) <= new Date(loanDate)) {
+                alert('Das Rückgabedatum muss nach dem Ausleihdatum liegen.');
+                return;
+            }
+
+            // Get selected device data
+            const selectedOption = deviceSelect.options[deviceSelect.selectedIndex];
+            if (!selectedOption.dataset.deviceData) {
+                alert('Gerätedaten nicht gefunden. Bitte wählen Sie ein anderes Gerät.');
+                return;
+            }
+            
+            const device = JSON.parse(selectedOption.dataset.deviceData);
+            console.log('🎯 Selected device:', device);
+
+            if (!device) {
+                alert('Gerät nicht gefunden.');
+                return;
+            }
+
+            if (device.status === 'Ausgeliehen') {
+                alert('Dieses Gerät ist bereits ausgeliehen.');
+                return;
+            }
+
+            if (currentLoanId !== null) {
+                // Update existing loan
+                const loan = devices.loans[currentLoanId];
+                if (loan) {
+                    // Reset old device if different
+                    if (loan.deviceId !== device.inventoryNumber) {
+                        const oldDevice = devices[loan.deviceType].find(d => d.inventoryNumber === loan.deviceId);
+                        if (oldDevice) {
+                            oldDevice.status = 'Aktiv';
+                            delete oldDevice.loanId;
+                        }
+                    }
+
+                    loan.deviceId = device.inventoryNumber || device.name;
+                    loan.deviceName = device.name || device.model;
+                    loan.deviceType = deviceType;
+                    loan.borrower = borrower;
+                    loan.loanDate = loanDate;
+                    loan.dueDate = dueDate;
+                    loan.notes = notes;
+                }
+            } else {
+                // Create new loan
+                const loan = {
+                    id: Date.now(),
+                    deviceId: device.inventoryNumber || device.name,
+                    deviceName: device.name || device.model,
+                    deviceType: deviceType,
+                    borrower: borrower,
+                    loanDate: loanDate,
+                    dueDate: dueDate,
+                    notes: notes,
+                    status: 'Aktiv',
+                    createdDate: new Date().toLocaleDateString('de-DE'),
+                    createdBy: currentUser ? currentUser.fullName : 'System'
+                };
+
+                if (!devices.loans) {
+                    devices.loans = [];
+                }
+                devices.loans.push(loan);
+                console.log('✅ Neue Ausleihe erstellt:', loan);
+            }
+
+            // Update device status
+            device.status = 'Ausgeliehen';
+            device.loanId = currentLoanId !== null ? currentLoanId : Date.now();
+
+            saveData();
+            renderCurrentTab();
+            renderLoans();
+            closeLoanModal();
+            
+            alert(currentLoanId !== null ? 'Ausleihe erfolgreich bearbeitet.' : 'Gerät erfolgreich ausgeliehen.');
+            console.log('🎉 Ausleihe abgeschlossen');
+        }
+
+        function addLoan() {
+            openLoanModal();
+        }
+
+
+
+        function editLoan(index) {
+            const loan = devices.loans[index];
+            if (!loan) return;
+
+            if (loan.status === 'Zurückgegeben') {
+                alert('Zurückgegebene Ausleihungen können nicht bearbeitet werden.');
+                return;
+            }
+
+            // Set device type first
+            document.getElementById('loanDeviceType').value = loan.deviceType;
+            
+            // Update device list for the selected type
+            updateDeviceList();
+            
+            // Wait a moment for the device list to populate, then select the device
+            setTimeout(() => {
+                document.getElementById('loanDeviceSelect').value = loan.deviceId;
+                document.getElementById('loanBorrower').value = loan.borrower;
+                document.getElementById('loanDate').value = loan.loanDate;
+                document.getElementById('loanDueDate').value = loan.dueDate;
+                document.getElementById('loanNotes').value = loan.notes || '';
+
+                currentLoanId = index; // Use index for compatibility
+                document.getElementById('loanModalTitle').textContent = 'Ausleihe bearbeiten';
+                document.getElementById('loanSubmitText').textContent = 'Aktualisieren';
+                document.getElementById('loanModal').style.display = 'flex';
+            }, 100);
+        }
+
+        function deleteLoan(index) {
+            const loan = devices.loans[index];
+            if (!loan) return;
+
+            if (!confirm('Möchten Sie diese Ausleihe wirklich löschen?\n\nGerät: ' + loan.deviceName + '\nEntleiher: ' + loan.borrower)) return;
+
+            // If loan is active, update device status
+            if (loan.status === 'Aktiv' || !loan.status) {
+                for (let deviceType of ['laptops', 'ipads', 'pcs']) {
+                    const deviceArray = devices[deviceType];
+                    const deviceIndex = deviceArray.findIndex(d => d.name === loan.deviceName || d.inventoryNumber === loan.deviceId);
+                    if (deviceIndex !== -1) {
+                        deviceArray[deviceIndex].status = 'Aktiv';
+                        delete deviceArray[deviceIndex].loanId;
+                        break;
+                    }
+                }
+            }
+
+            devices.loans.splice(index, 1);
+            renderLoans();
+            saveData();
+            console.log('🗑️ Verleihung gelöscht');
+        }
+
+
+
+        function returnLoan(index) {
+            const loan = devices.loans[index];
+            if (!loan) return;
+
+            if (!confirm('Möchten Sie das Gerät "' + loan.deviceName + '" wirklich zurücknehmen?')) return;
+
+            // Find the original device and mark as available
+            for (let deviceType of ['laptops', 'ipads', 'pcs']) {
+                const deviceArray = devices[deviceType];
+                const deviceIndex = deviceArray.findIndex(d => d.name === loan.deviceName || d.inventoryNumber === loan.deviceId);
+                if (deviceIndex !== -1) {
+                    deviceArray[deviceIndex].status = 'Aktiv';
+                    deviceArray[deviceIndex].assignedTo = '';
+                    delete deviceArray[deviceIndex].loanId;
+                    break;
+                }
+            }
+            
+            // Mark loan as returned instead of deleting
+            loan.status = 'Zurückgegeben';
+            loan.returnDate = new Date().toISOString().split('T')[0];
+            
+            renderCurrentTab();
+            renderLoans();
+            saveData();
+            
+            alert('Gerät erfolgreich zurückgegeben und als verfügbar markiert!');
+            console.log('↩️ Gerät zurückgegeben:', loan.deviceName);
+        }
+
+        // Barcode Functions
+        function generateBarcode(text, elementId) {
+            try {
+                if (typeof JsBarcode !== 'undefined') {
+                    JsBarcode(`#${elementId}`, text, {
+                        format: "CODE128",
+                        width: 2,
+                        height: 50,
+                        displayValue: true,
+                        fontSize: 12,
+                        margin: 10
+                    });
+                    return true;
+                } else {
+                    console.error('JsBarcode library not loaded');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Barcode generation error:', error);
+                return false;
+            }
+        }
+
+        function generateBarcodeForDevice(device) {
+            // Generate barcode based on inventory number or device name
+            if (device.barcode) {
+                return device.barcode;
+            } else if (device.inventoryNumber) {
+                return device.inventoryNumber;
+            } else {
+                // Generate unique barcode based on device name and timestamp
+                const timestamp = Date.now().toString().slice(-6);
+                return `${device.name || 'DEV'}-${timestamp}`.replace(/[^a-zA-Z0-9-]/g, '').toUpperCase();
+            }
+        }
+
+        function generateNewBarcode() {
+            const timestamp = Date.now().toString().slice(-6);
+            const deviceName = document.getElementById('deviceName').value.trim() || 'DEVICE';
+            const newBarcode = `${deviceName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()}-${timestamp}`;
+            document.getElementById('deviceBarcode').value = newBarcode;
+        }
+
+        function downloadBarcode(barcodeValue, deviceName) {
+            try {
+                // Create temporary canvas for barcode generation
+                const canvas = document.createElement('canvas');
+                JsBarcode(canvas, barcodeValue, {
+                    format: "CODE128",
+                    width: 3,
+                    height: 100,
+                    displayValue: true,
+                    fontSize: 16,
+                    margin: 20,
+                    background: "#ffffff",
+                    lineColor: "#000000"
+                });
+                
+                // Convert to blob and download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `barcode-${deviceName || barcodeValue}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+                
+                console.log('📥 Barcode downloaded:', barcodeValue);
+            } catch (error) {
+                console.error('❌ Barcode download error:', error);
+                alert('Fehler beim Herunterladen des Barcodes');
+            }
+        }
+
+        function printBarcode(barcodeValue, deviceName) {
+            try {
+                const canvas = document.createElement('canvas');
+                JsBarcode(canvas, barcodeValue, {
+                    format: "CODE128",
+                    width: 3,
+                    height: 100,
+                    displayValue: true,
+                    fontSize: 16,
+                    margin: 20,
+                    background: "#ffffff",
+                    lineColor: "#000000"
+                });
+                
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Barcode - ${deviceName || barcodeValue}</title>
+                            <style>
+                                body { 
+                                    font-family: Arial, sans-serif; 
+                                    text-align: center; 
+                                    margin: 20px;
+                                }
+                                .barcode-info {
+                                    margin: 20px 0;
+                                    font-size: 14px;
+                                }
+                                @media print {
+                                    @page { margin: 0.5in; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h2>${deviceName || 'Gerät'}</h2>
+                            <div class="barcode-info">Inventarnummer: ${barcodeValue}</div>
+                            <img src="${canvas.toDataURL()}" alt="Barcode">
+                            <div class="barcode-info">Erstellt am: ${new Date().toLocaleDateString('de-DE')}</div>
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            } catch (error) {
+                console.error('❌ Barcode print error:', error);
+                alert('Fehler beim Drucken des Barcodes');
+            }
+        }
+
+        // Barcode Scanner Functions
+        let html5QrCode = null;
+        let foundDevice = null;
+        let foundDeviceIndex = -1;
+        let foundDeviceType = '';
+
+        function openBarcodeScanner() {
+            // Close any existing scanner first
+            if (html5QrCode) {
+                closeBarcodeScanner();
+                setTimeout(() => {
+                    openScannerModal();
+                }, 500);
+            } else {
+                openScannerModal();
+            }
+        }
+        
+        function openScannerModal() {
+            document.getElementById('barcodeScannerModal').style.display = 'flex';
+            document.getElementById('manual-barcode-input').value = '';
+            hideScannerResults();
+            
+            // Initialize scanner after modal is visible
+            setTimeout(() => {
+                initBarcodeScanner();
+            }, 300);
+            
+            console.log('📱 Scanner-Modal geöffnet');
+        }
+
+        function closeBarcodeScanner() {
+            try {
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        html5QrCode = null;
+                        console.log('✅ Scanner gestoppt');
+                    }).catch(err => {
+                        console.error('Scanner stop error:', err);
+                        html5QrCode = null;
+                    });
+                }
+            } catch (error) {
+                console.error('Scanner cleanup error:', error);
+                html5QrCode = null;
+            }
+            
+            // Reset status
+            document.getElementById('scanner-status').innerHTML = '<i class="fas fa-camera"></i> Kamera wird initialisiert...';
+            
+            // Hide results
+            hideScannerResults();
+            
+            // Close modal
+            document.getElementById('barcodeScannerModal').style.display = 'none';
+            
+            console.log('🔒 Scanner-Modal geschlossen');
+        }
+
+        function initBarcodeScanner() {
+            const readerElement = document.getElementById('barcode-reader');
+            const statusElement = document.getElementById('scanner-status');
+            
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    startScanner();
+                });
+            } else {
+                startScanner();
+            }
+
+            function startScanner() {
+                html5QrCode = new Html5Qrcode("barcode-reader");
+                
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices && devices.length) {
+                        statusElement.innerHTML = '<i class="fas fa-camera"></i> Kamera aktiv - Barcode vor die Kamera halten';
+                        
+                        const cameraId = devices[0].id;
+                        html5QrCode.start(
+                            cameraId,
+                            {
+                                fps: 10,
+                                qrbox: { width: 250, height: 150 },
+                                aspectRatio: 1.7
+                            },
+                            (decodedText, decodedResult) => {
+                                searchBarcodeInDevices(decodedText);
+                            },
+                            (errorMessage) => {
+                                // Ignore continuous scan errors
+                            }
+                        ).catch(err => {
+                            console.error('Scanner start error:', err);
+                            statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Kamera konnte nicht gestartet werden';
+                        });
+                    } else {
+                        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Keine Kamera verfügbar';
+                    }
+                }).catch(err => {
+                    console.error('Camera access error:', err);
+                    statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Kamerazugriff verweigert';
+                });
+            }
+        }
+
+        function searchManualBarcode() {
+            const barcodeInput = document.getElementById('manual-barcode-input').value.trim();
+            if (barcodeInput) {
+                searchBarcodeInDevices(barcodeInput);
+            } else {
+                alert('Bitte geben Sie einen Barcode ein.');
+            }
+        }
+
+        function searchBarcodeInDevices(barcode) {
+            foundDevice = null;
+            foundDeviceIndex = -1;
+            foundDeviceType = '';
+
+            // Search in all device categories
+            for (let i = 0; i < deviceTypes.length; i++) {
+                const deviceType = deviceTypes[i];
+                const deviceArray = devices[deviceType];
+                
+                const index = deviceArray.findIndex(device => 
+                    device.barcode === barcode || 
+                    device.inventoryNumber === barcode ||
+                    device.name === barcode
+                );
+                
+                if (index !== -1) {
+                    foundDevice = deviceArray[index];
+                    foundDeviceIndex = index;
+                    foundDeviceType = deviceType;
+                    break;
+                }
+            }
+
+            if (foundDevice) {
+                showFoundDevice(foundDevice);
+                // Stop scanner when device is found
+                if (html5QrCode) {
+                    html5QrCode.stop().catch(err => console.error('Scanner stop error:', err));
+                }
+                console.log('📱 Gerät gefunden:', foundDevice.name);
+            } else {
+                showScannerError(`Kein Gerät mit Barcode "${barcode}" gefunden.`);
+                console.log('❌ Gerät nicht gefunden:', barcode);
+            }
+        }
+
+        function showFoundDevice(device) {
+            hideScannerResults();
+            
+            const resultDiv = document.getElementById('scanner-result');
+            const previewDiv = document.getElementById('device-preview');
+            
+            previewDiv.innerHTML = `
+                <h4 style="margin-bottom: 12px; color: var(--gray-900);">
+                    <i class="fas fa-laptop"></i> ${device.name || 'Unbenannt'}
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px;">
+                    <div><strong>Inventarnummer:</strong></div>
+                    <div>${device.inventoryNumber || 'N/A'}</div>
+                    
+                    <div><strong>Barcode:</strong></div>
+                    <div style="font-family: monospace;">${device.barcode || 'N/A'}</div>
+                    
+                    <div><strong>Modell:</strong></div>
+                    <div>${device.model || 'N/A'}</div>
+                    
+                    <div><strong>Standort:</strong></div>
+                    <div>${device.location || 'N/A'}</div>
+                    
+                    <div><strong>Status:</strong></div>
+                    <div>
+                        <span class="status-badge status-${device.status?.toLowerCase().replace('ü', 'ue') || 'available'}">
+                            ${device.status || 'Verfügbar'}
+                        </span>
+                    </div>
+                    
+                    <div><strong>Zugewiesen an:</strong></div>
+                    <div>${device.assignedTo || 'Nicht zugewiesen'}</div>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+        }
+
+        function showScannerError(message) {
+            hideScannerResults();
+            
+            const errorDiv = document.getElementById('scanner-error');
+            const messageP = document.getElementById('error-message');
+            
+            messageP.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Hide error after 3 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function hideScannerResults() {
+            document.getElementById('scanner-result').style.display = 'none';
+            document.getElementById('scanner-error').style.display = 'none';
+        }
+
+        function editFoundDevice() {
+            if (foundDevice && foundDeviceIndex !== -1) {
+                // Switch to the correct tab
+                const tabIndex = deviceTypes.indexOf(foundDeviceType);
+                switchTab(tabIndex);
+                
+                // Close scanner modal
+                closeBarcodeScanner();
+                
+                // Open edit modal for the found device
+                setTimeout(() => {
+                    editDevice(foundDeviceIndex);
+                }, 300);
+                
+                console.log('✏️ Bearbeite gefundenes Gerät:', foundDevice.name);
+            }
+        }
+
+        function reportDefectForFoundDevice() {
+            if (foundDevice && foundDeviceIndex !== -1) {
+                console.log('🛠️ Defekt melden für gefundenes Gerät:', foundDevice.name);
+                
+                // Set the reporting index
+                reportingDefectIndex = foundDeviceIndex;
+                
+                // Switch to the correct tab
+                const tabIndex = deviceTypes.indexOf(foundDeviceType);
+                if (tabIndex !== -1) {
+                    switchTab(tabIndex);
+                }
+                
+                // Close scanner modal first
+                closeBarcodeScanner();
+                
+                // Open defect modal after a short delay
+                setTimeout(() => {
+                    // Pre-fill defect form with device info
+                    const defectDeviceInput = document.getElementById('defectDevice');
+                    const defectInventoryInput = document.getElementById('defectInventoryNumber');
+                    
+                    if (defectDeviceInput) {
+                        defectDeviceInput.value = foundDevice.name || foundDevice.model || 'Unbenanntes Gerät';
+                    }
+                    if (defectInventoryInput) {
+                        defectInventoryInput.value = foundDevice.inventoryNumber || '';
+                    }
+                    
+                    // Open the defect modal
+                    const defectModal = document.getElementById('defectModal');
+                    if (defectModal) {
+                        defectModal.style.display = 'flex';
+                        
+                        // Auto-select medium urgency as default
+                        selectUrgency('medium');
+                        
+                        console.log('✅ Defekt-Modal geöffnet für:', foundDevice.name);
+                    } else {
+                        console.error('❌ Defekt-Modal nicht gefunden');
+                        alert('Defekt-Meldung konnte nicht geöffnet werden. Bitte versuchen Sie es über das Gerätemenü.');
+                    }
+                }, 300);
+            } else {
+                console.error('❌ Kein Gerät für Defekt-Meldung gefunden');
+                alert('Kein Gerät für Defekt-Meldung verfügbar.');
+            }
+        }
+
+        // Enhanced Location Options Management
+        function updateLocationOptions() {
+            const locationSelect = document.getElementById('deviceLocation');
+            const currentDeviceType = deviceTypes[currentTab];
+            const options = locationOptions[currentDeviceType];
+            
+            locationSelect.innerHTML = '<option value="">Bitte wählen...</option>';
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                locationSelect.appendChild(optionElement);
+            });
+        }
+
+        // Dark Mode System
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            
+            if (isDark) {
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('darkMode', 'false');
+            }
+            
+            console.log('🌙 Dark Mode:', isDark ? 'aktiviert' : 'deaktiviert');
+        }
+
+        function loadTheme() {
+            // Default to light mode (day mode) if no preference is saved
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeIcon').className = 'fas fa-sun';
+            } else {
+                // Ensure light mode is set as default
+                document.body.classList.remove('dark-mode');
+                document.getElementById('darkModeIcon').className = 'fas fa-moon';
+            }
+        }
+
+        // Defect Reporting System
+        function reportDefect(index) {
+            reportingDefectIndex = index;
+            const deviceType = deviceTypes[currentTab];
+            const device = devices[deviceType][index];
+            
+            document.getElementById('defectDeviceName').value = `${device.name || 'Unbenannt'} (${device.inventoryNumber || 'N/A'})`;
+            document.getElementById('defectReporter').value = currentUser.fullName;
+            document.getElementById('defectDescription').value = '';
+            
+            // Reset urgency selection
+            document.querySelectorAll('.urgency-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.urgency-medium').classList.add('selected');
+            selectedUrgency = 'medium';
+            
+            document.getElementById('defectModal').style.display = 'flex';
+        }
+
+        function selectUrgency(urgency) {
+            selectedUrgency = urgency;
+            document.querySelectorAll('.urgency-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.urgency-${urgency}`).classList.add('selected');
+        }
+
+        function saveDefectReport(e) {
+            e.preventDefault();
+            
+            const description = document.getElementById('defectDescription').value.trim();
+            if (!description) {
+                alert('Bitte geben Sie eine Problembeschreibung ein!');
+                return;
+            }
+            
+            const deviceType = deviceTypes[currentTab];
+            const device = devices[deviceType][reportingDefectIndex];
+            
+            // Add defect report to device
+            device.defectReport = {
+                description: description,
+                reportedBy: currentUser.fullName,
+                reportDate: new Date().toLocaleDateString('de-DE'),
+                urgency: selectedUrgency,
+                status: 'Offen'
+            };
+            
+            // Change device status to defective
+            device.status = 'Defekt';
+            
+            renderDevices();
+            closeDefectModal();
+            saveData();
+            
+            alert('Defekt erfolgreich gemeldet!');
+            console.log('🔧 Defekt gemeldet für Gerät:', device.name);
+        }
+
+        function closeDefectModal() {
+            document.getElementById('defectModal').style.display = 'none';
+            reportingDefectIndex = -1;
+        }
+
+        // Device Management Functions
+        function openAddModal() {
+            editingIndex = -1;
+            document.getElementById('modalTitle').textContent = 'Gerät hinzufügen';
+            document.getElementById('deviceForm').reset();
+            updateLocationOptions();
+            document.getElementById('deviceModal').style.display = 'flex';
+        }
+
+        function editDevice(index) {
+            editingIndex = index;
+            const deviceType = deviceTypes[currentTab];
+            const device = devices[deviceType][index];
+            
+            document.getElementById('modalTitle').textContent = 'Gerät bearbeiten';
+            document.getElementById('deviceName').value = device.name || '';
+            document.getElementById('deviceBarcode').value = device.barcode || '';
+            document.getElementById('inventoryNumber').value = device.inventoryNumber || '';
+            document.getElementById('deviceModel').value = device.model || '';
+            document.getElementById('deviceOS').value = device.os || '';
+            document.getElementById('deviceLocation').value = device.location || '';
+            document.getElementById('assignedTo').value = device.assignedTo || '';
+            document.getElementById('deviceStatus').value = device.status || 'Verfügbar';
+            document.getElementById('remarks').value = device.remarks || '';
+            
+            updateLocationOptions();
+            document.getElementById('deviceModal').style.display = 'flex';
+        }
+
+        function handleLoanSubmit(e) {
+            e.preventDefault();
+            addDeviceToLoan();
+        }
+
+        function saveDevice(e) {
+            e.preventDefault();
+            
+            const deviceData = {
+                name: document.getElementById('deviceName').value.trim(),
+                inventoryNumber: document.getElementById('inventoryNumber').value.trim(),
+                model: document.getElementById('deviceModel').value.trim(),
+                os: document.getElementById('deviceOS').value,
+                location: document.getElementById('deviceLocation').value,
+                assignedTo: document.getElementById('assignedTo').value.trim(),
+                status: document.getElementById('deviceStatus').value,
+                remarks: document.getElementById('remarks').value.trim(),
+                barcode: document.getElementById('deviceBarcode').value.trim(),
+                lastModified: new Date().toLocaleDateString('de-DE'),
+                modifiedBy: currentUser.fullName
+            };
+            
+            if (!deviceData.name || !deviceData.inventoryNumber) {
+                alert('Name und Inventarnummer sind Pflichtfelder!');
+                return;
+            }
+            
+            // Auto-generate barcode if not provided
+            if (!deviceData.barcode) {
+                deviceData.barcode = generateBarcodeForDevice(deviceData);
+            }
+            
+            const deviceType = deviceTypes[currentTab];
+            
+            if (editingIndex === -1) {
+                devices[deviceType].push(deviceData);
+                console.log('➕ Neues Gerät hinzugefügt:', deviceData.name);
+            } else {
+                devices[deviceType][editingIndex] = { ...devices[deviceType][editingIndex], ...deviceData };
+                console.log('✏️ Gerät aktualisiert:', deviceData.name);
+            }
+            
+            renderDevices();
+            closeModal();
+            saveData();
+        }
+
+        function deleteDevice(index) {
+            const deviceType = deviceTypes[currentTab];
+            const device = devices[deviceType][index];
+            
+            if (confirm(`Gerät "${device.name || 'Unbenannt'}" wirklich löschen?`)) {
+                devices[deviceType].splice(index, 1);
+                renderDevices();
+                saveData();
+                console.log('🗑️ Gerät gelöscht:', device.name);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('deviceModal').style.display = 'none';
+            editingIndex = -1;
+        }
+
+        // Rendering Functions
+        function renderDevices() {
+            const deviceList = document.getElementById('deviceList');
+            const deviceType = deviceTypes[currentTab];
+            const deviceArray = devices[deviceType];
+            
+            if (deviceArray.length === 0) {
+                deviceList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--gray-500);">
+                        <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 8px;">Keine Geräte vorhanden</h3>
+                        <p>Fügen Sie Ihr erstes ${deviceNames[currentTab].slice(0, -1)} hinzu, um zu beginnen.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            deviceList.innerHTML = deviceArray.map((device, index) => {
+                const statusClass = device.status?.toLowerCase().replace('ü', 'ue') || 'available';
+                const hasDefect = device.defectReport && device.status === 'Defekt';
+                const barcodeValue = device.barcode || generateBarcodeForDevice(device);
+                const barcodeId = `barcode-${deviceType}-${index}`;
+                
+                return `
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-name">${device.name || 'Unbenannt'}</div>
+                            <div class="device-actions">
+                                <button class="btn btn-warning" onclick="reportDefect(${index})" title="Defekt melden">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </button>
+                                <button class="btn btn-secondary" onclick="editDevice(${index})" title="Bearbeiten">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteDevice(${index})" title="Löschen">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Inventarnummer:</span>
+                            <span class="device-info-value">${device.inventoryNumber || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Modell:</span>
+                            <span class="device-info-value">${device.model || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Betriebssystem:</span>
+                            <span class="device-info-value">${device.os || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Standort:</span>
+                            <span class="device-info-value">${device.location || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Zugewiesen an:</span>
+                            <span class="device-info-value">${device.assignedTo || 'Nicht zugewiesen'}</span>
+                        </div>
+                        
+                        <div class="device-info-row">
+                            <span class="device-info-label">Status:</span>
+                            <span class="status-badge status-${statusClass}">${device.status || 'Verfügbar'}</span>
+                        </div>
+                        
+                        <div class="barcode-container">
+                            <div class="device-info-label" style="margin-bottom: 8px;">Barcode:</div>
+                            <div class="barcode-display">
+                                <svg id="${barcodeId}" class="barcode-svg"></svg>
+                            </div>
+                            <div class="barcode-actions">
+                                <button class="btn btn-secondary" onclick="downloadBarcode('${barcodeValue}', '${device.name || 'device'}')" title="Barcode herunterladen">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button class="btn btn-secondary" onclick="printBarcode('${barcodeValue}', '${device.name || 'device'}')" title="Barcode drucken">
+                                    <i class="fas fa-print"></i> Drucken
+                                </button>
+                            </div>
+                        </div>
+                        
+                        ${device.remarks ? `
+                            <div class="device-info-row">
+                                <span class="device-info-label">Bemerkungen:</span>
+                                <span class="device-info-value">${device.remarks}</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${hasDefect ? `
+                            <div class="defect-info">
+                                <div class="defect-title">🔧 Defekt gemeldet</div>
+                                <div class="defect-description">${device.defectReport.description}</div>
+                                <div class="defect-meta">
+                                    Gemeldet von: ${device.defectReport.reportedBy} am ${device.defectReport.reportDate}
+                                    • Dringlichkeit: ${getUrgencyText(device.defectReport.urgency)}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${device.lastModified ? `
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); font-size: 12px; color: var(--gray-500);">
+                                Zuletzt geändert: ${device.lastModified} von ${device.modifiedBy || 'System'}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            // Generate barcodes after DOM is updated
+            setTimeout(() => {
+                deviceArray.forEach((device, index) => {
+                    const barcodeValue = device.barcode || generateBarcodeForDevice(device);
+                    const barcodeId = `barcode-${deviceType}-${index}`;
+                    generateBarcode(barcodeValue, barcodeId);
+                });
+            }, 100);
+        }
+
+        function getUrgencyText(urgency) {
+            const urgencyMap = {
+                'low': 'Niedrig',
+                'medium': 'Mittel',
+                'high': 'Hoch'
+            };
+            return urgencyMap[urgency] || urgency;
+        }
+
+        // Admin Panel Management with Password Confirmation
+        function openAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('Zugriff verweigert! Sie benötigen Administrator-Rechte.');
+                return;
+            }
+            
+            // Check if admin password is set for this user
+            if (!adminPasswords[currentUser.username]) {
+                showAdminPasswordSetup();
+                return;
+            }
+            
+            // Always ask for admin password confirmation
+            showAdminPasswordConfirm();
+        }
+
+        function showAdminPasswordConfirm() {
+            document.getElementById('adminPasswordConfirmModal').style.display = 'flex';
+            document.getElementById('confirmAdminPasswordInput').value = '';
+            document.getElementById('adminPasswordError').classList.add('hidden');
+            
+            // Focus on password input
+            setTimeout(() => {
+                document.getElementById('confirmAdminPasswordInput').focus();
+            }, 300);
+        }
+
+        function closeAdminPasswordConfirm() {
+            document.getElementById('adminPasswordConfirmModal').style.display = 'none';
+            document.getElementById('confirmAdminPasswordInput').value = '';
+            document.getElementById('adminPasswordError').classList.add('hidden');
+        }
+
+        function confirmAdminPassword(e) {
+            e.preventDefault();
+            
+            const enteredPassword = document.getElementById('confirmAdminPasswordInput').value;
+            const correctPassword = adminPasswords[currentUser.username];
+            
+            if (enteredPassword === correctPassword) {
+                closeAdminPasswordConfirm();
+                renderUsersList();
+                document.getElementById('adminModal').style.display = 'flex';
+                console.log('⚙️ Admin-Panel geöffnet');
+            } else {
+                document.getElementById('adminPasswordError').classList.remove('hidden');
+                document.getElementById('confirmAdminPasswordInput').value = '';
+                document.getElementById('confirmAdminPasswordInput').focus();
+                console.log('❌ Falsches Admin-Passwort');
+            }
+        }
+
+        function showAdminPasswordSetup() {
+            document.getElementById('adminPasswordModal').style.display = 'flex';
+        }
+
+        function setupAdminPassword(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('setupAdminPassword').value;
+            const confirmPassword = document.getElementById('confirmAdminPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwörter stimmen nicht überein!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Passwort muss mindestens 6 Zeichen lang sein!');
+                return;
+            }
+            
+            adminPasswords[currentUser.username] = password;
+            saveAdminPasswords();
+            
+            document.getElementById('adminPasswordModal').style.display = 'none';
+            document.getElementById('setupAdminPasswordForm').reset();
+            
+            // Now open admin panel
+            renderUsersList();
+            document.getElementById('adminModal').style.display = 'flex';
+            
+            console.log('🔐 Admin-Passwort eingerichtet');
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.admin-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.add('active');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function renderUsersList() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '';
+            
+            Object.entries(users).forEach(([username, userData]) => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                userItem.innerHTML = `
+                    <div class="user-info-text">
+                        <div class="user-name">${userData.fullName}</div>
+                        <div class="user-role">@${username}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="role-badge role-${userData.isAdmin ? 'admin' : 'user'}">
+                            ${userData.isAdmin ? 'Admin' : 'Benutzer'}
+                        </span>
+                        <button class="btn btn-danger" onclick="deleteUser('${username}')" 
+                                ${username === currentUser.username ? 'disabled title="Sie können sich nicht selbst löschen"' : ''}>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                usersList.appendChild(userItem);
+            });
+        }
+
+        // User Management
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'none';
+            document.getElementById('addUserForm').reset();
+        }
+
+        function addNewUser(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('newUsername').value.trim();
+            const fullName = document.getElementById('newUserFullName').value.trim();
+            const role = document.getElementById('newUserRole').value;
+            const password = document.getElementById('newUserPassword').value;
+            
+            if (users[username]) {
+                alert('Benutzername bereits vergeben!');
+                return;
+            }
+            
+            users[username] = {
+                password: password,
+                fullName: fullName,
+                isAdmin: role === 'admin',
+                firstLogin: true
+            };
+            
+            saveUsers();
+            renderUsersList();
+            closeAddUserModal();
+            
+            alert(`Benutzer "${fullName}" erfolgreich erstellt!`);
+            console.log('👤 Neuer Benutzer erstellt:', fullName);
+        }
+
+        function deleteUser(username) {
+            if (username === currentUser.username) {
+                alert('Sie können sich nicht selbst löschen!');
+                return;
+            }
+            
+            if (confirm(`Benutzer "${users[username].fullName}" wirklich löschen?`)) {
+                delete users[username];
+                saveUsers();
+                renderUsersList();
+                console.log('🗑️ Benutzer gelöscht:', username);
+            }
+        }
+
+        function changeAdminPassword() {
+            const newPassword = document.getElementById('newAdminPassword').value;
+            
+            if (!newPassword || newPassword.length < 6) {
+                alert('Passwort muss mindestens 6 Zeichen lang sein!');
+                return;
+            }
+            
+            adminPasswords[currentUser.username] = newPassword;
+            saveAdminPasswords();
+            
+            document.getElementById('newAdminPassword').value = '';
+            alert('Admin-Passwort erfolgreich geändert!');
+            console.log('🔐 Admin-Passwort geändert');
+        }
+
+        // CSV Import/Export
+        function handleCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.split('\n').filter(line => line.trim());
+                    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                    
+                    const importedDevices = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                        if (values.length >= headers.length) {
+                            const device = {};
+                            headers.forEach((header, index) => {
+                                device[header] = values[index] || '';
+                            });
+                            importedDevices.push(device);
+                        }
+                    }
+                    
+                    const deviceType = deviceTypes[currentTab];
+                    devices[deviceType] = [...devices[deviceType], ...importedDevices];
+                    
+                    renderDevices();
+                    saveData();
+                    
+                    alert(`${importedDevices.length} Geräte erfolgreich importiert!`);
+                    console.log('📁 CSV-Import erfolgreich:', importedDevices.length, 'Geräte');
+                } catch (error) {
+                    alert('Fehler beim Importieren der CSV-Datei. Bitte überprüfen Sie das Format.');
+                    console.error('❌ CSV-Import Fehler:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportCSV() {
+            const deviceType = deviceTypes[currentTab];
+            const deviceArray = devices[deviceType];
+            
+            if (deviceArray.length === 0) {
+                alert('Keine Geräte zum Exportieren vorhanden!');
+                return;
+            }
+            
+            const headers = ['name', 'inventoryNumber', 'model', 'os', 'location', 'assignedTo', 'status', 'remarks'];
+            const headerLabels = ['Name', 'Inventarnummer', 'Modell', 'Betriebssystem', 'Standort', 'Zugewiesen an', 'Status', 'Bemerkungen'];
+            
+            let csv = headerLabels.join(',') + '\n';
+            
+            deviceArray.forEach(device => {
+                const row = headers.map(field => {
+                    const value = device[field] || '';
+                    return `"${value.toString().replace(/"/g, '""')}"`;
+                });
+                csv += row.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${deviceNames[currentTab]}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            console.log('📤 CSV-Export erfolgreich:', deviceArray.length, 'Geräte');
+        }
+
+        // Data Persistence
+        function saveData() {
+            localStorage.setItem('itAssetDevices', JSON.stringify(devices));
+        }
+
+        function loadData() {
+            const savedDevices = localStorage.getItem('itAssetDevices');
+            if (savedDevices) {
+                Object.assign(devices, JSON.parse(savedDevices));
+            }
+        }
+
+        function saveUsers() {
+            localStorage.setItem('itAssetUsers', JSON.stringify(users));
+        }
+
+        function loadUsers() {
+            const savedUsers = localStorage.getItem('itAssetUsers');
+            if (savedUsers) {
+                const parsedUsers = JSON.parse(savedUsers);
+                // Merge saved users with default users, keeping defaults if no saved data
+                Object.assign(users, parsedUsers);
+            }
+            
+            // Ensure default users exist if not in saved data
+            if (!users['mads.duewel']) {
+                users['mads.duewel'] = { password: 'Start123', fullName: 'Mads Düwel', isAdmin: false, firstLogin: true };
+            }
+            if (!users['jona.snoek']) {
+                users['jona.snoek'] = { password: 'Start123', fullName: 'Jona Snoek', isAdmin: false, firstLogin: true };
+            }
+            if (!users['admin']) {
+                users['admin'] = { password: 'Start123', fullName: 'Administrator', isAdmin: true, firstLogin: true };
+            }
+            
+            console.log('👥 Benutzer geladen:', Object.keys(users));
+        }
+
+        function saveAdminPasswords() {
+            localStorage.setItem('itAssetAdminPasswords', JSON.stringify(adminPasswords));
+        }
+
+        function loadAdminPasswords() {
+            const savedPasswords = localStorage.getItem('itAssetAdminPasswords');
+            if (savedPasswords) {
+                Object.assign(adminPasswords, JSON.parse(savedPasswords));
+            }
+        }
+
+        // Sample Data Loading
+        function loadSampleData() {
+            loadData();
+            
+            // Add sample data if no devices exist
+            if (devices.laptops.length === 0 && devices.ipads.length === 0 && devices.pcs.length === 0) {
+                devices.laptops = [
+                    {
+                        name: 'Laptop-001',
+                        inventoryNumber: 'LAP-001',
+                        barcode: 'LAP-001-2025',
+                        model: 'Dell Latitude 5520',
+                        os: 'Windows 11',
+                        location: 'NBW1',
+                        assignedTo: 'Max Mustermann',
+                        status: 'Zugewiesen',
+                        remarks: 'Standardausstattung',
+                        lastModified: new Date().toLocaleDateString('de-DE'),
+                        modifiedBy: 'System'
+                    },
+                    {
+                        name: 'Laptop-002',
+                        inventoryNumber: 'LAP-002',
+                        barcode: 'LAP-002-2025',
+                        model: 'Lenovo ThinkPad T14',
+                        os: 'Windows 10',
+                        location: 'NBW2',
+                        assignedTo: '',
+                        status: 'Verfügbar',
+                        remarks: '',
+                        lastModified: new Date().toLocaleDateString('de-DE'),
+                        modifiedBy: 'System'
+                    }
+                ];
+                
+                devices.ipads = [
+                    {
+                        name: 'iPad-001',
+                        inventoryNumber: 'IPAD-001',
+                        barcode: 'IPAD-001-2025',
+                        model: 'iPad Air 5. Generation',
+                        os: 'iPadOS',
+                        location: 'IPAD-Wagen',
+                        assignedTo: '',
+                        status: 'Verfügbar',
+                        remarks: 'Mit Tastatur',
+                        lastModified: new Date().toLocaleDateString('de-DE'),
+                        modifiedBy: 'System'
+                    }
+                ];
+                
+                devices.pcs = [
+                    {
+                        name: 'PC-001',
+                        inventoryNumber: 'PC-001',
+                        barcode: 'PC-001-2025',
+                        model: 'HP EliteDesk 800',
+                        os: 'Windows 11',
+                        location: 'IF1',
+                        assignedTo: '',
+                        status: 'Wartung',
+                        remarks: 'RAM-Upgrade erforderlich',
+                        lastModified: new Date().toLocaleDateString('de-DE'),
+                        modifiedBy: 'System'
+                    }
+                ];
+                
+                saveData();
+                console.log('📋 Beispieldaten mit Barcodes geladen');
+            }
+        }
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
